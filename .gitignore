@@ -1,0 +1,20 @@
+# --- Mosquitto ---
+docker/mosquitto/data/
+docker/mosquitto/log/
+
+# --- Node-RED (Estrategia: Ignorar todo excepto los flujos públicos) ---
+# Primero, ignoramos TODA la carpeta de datos por seguridad
+docker/nodered/data/*
+
+# Luego, permitimos EXCLUSIVAMENTE el archivo de flujos (tu dashboard y lógica)
+!docker/nodered/data/flows.json
+
+# Pero nos aseguramos de que los backups y credenciales sigan ignorados
+docker/nodered/data/lib/
+docker/nodered/data/node_modules/
+docker/nodered/data/.*
+docker/nodered/data/flows_cred.json
+
+# --- Firmware ---
+firmware/secrets.h
+

@@ -1,0 +1,25 @@
+services:
+  # Servicio 1: El Broker MQTT
+  mosquitto:
+    image: eclipse-mosquitto:2.0.15
+    container_name: mqtt-broker
+    ports:
+      - "1883:1883" # Puerto para dispositivos IoT
+      - "9001:9001" # Puerto para WebSockets
+    volumes:
+      - ./mosquitto/config:/mosquitto/config # Para guardar tu configuración
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    restart: unless-stopped
+
+  # Servicio 2: Node-RED
+  nodered:
+    build: ./nodered  # Docker buscará el 'Dockerfile' dentro de esa carpeta
+    container_name: nodered-container
+    depends_on:
+      - mosquitto # Espera a que el broker encienda primero
+    ports:
+      - "1880:1880" # Puerto de la interfaz web
+    volumes:
+      - ./nodered/data:/data # Para que tus flujos no se borren al apagar
+    restart: unless-stopped
