@@ -39,6 +39,126 @@
         "sessionExpiry": ""
     },
     {
+        "id": "51e07172cf2c7ce3",
+        "type": "mqtt-broker",
+        "name": "External-MQQT-Broker",
+        "broker": "broker.emqx.io",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "9f23e3e52e2e8b1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "a70eeb0346cd9ad7",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "2e5e46f63fc0e516",
+        "type": "ui-page",
+        "name": "Page 1",
+        "ui": "9f23e3e52e2e8b1b",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "a70eeb0346cd9ad7",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "201b61496aae32d4",
+        "type": "ui-group",
+        "name": "Group 1",
+        "page": "2e5e46f63fc0e516",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
         "id": "1d9899b81a03c3b0",
         "type": "debug",
         "z": "9c3d05193df0bfa6",
@@ -74,5 +194,99 @@
                 "1d9899b81a03c3b0"
             ]
         ]
+    },
+    {
+        "id": "0e6e205c792306f2",
+        "type": "mqtt in",
+        "z": "9c3d05193df0bfa6",
+        "name": "",
+        "topic": "sipa/edge-pipeline/#",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "51e07172cf2c7ce3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 170,
+        "y": 300,
+        "wires": [
+            [
+                "b8f8a13d5c0f8a86"
+            ]
+        ]
+    },
+    {
+        "id": "b8f8a13d5c0f8a86",
+        "type": "debug",
+        "z": "9c3d05193df0bfa6",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 480,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "4fef1a0cab473326",
+        "type": "ui-button",
+        "z": "9c3d05193df0bfa6",
+        "group": "201b61496aae32d4",
+        "name": "",
+        "label": "button",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 250,
+        "y": 100,
+        "wires": [
+            [
+                "29ada6390e5b4b79"
+            ]
+        ]
+    },
+    {
+        "id": "29ada6390e5b4b79",
+        "type": "mqtt out",
+        "z": "9c3d05193df0bfa6",
+        "name": "Testing",
+        "topic": "sipa/edge-pipeline/sym/dht/temp",
+        "qos": "2",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "51e07172cf2c7ce3",
+        "x": 420,
+        "y": 100,
+        "wires": []
     }
 ]
