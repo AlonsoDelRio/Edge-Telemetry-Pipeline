@@ -8,5 +8,5 @@
 // MQTT Mosquitto Broker
 // For a cloud MQTT broker, type the domain name or IP
 // Mosquitto broker running via Docker Compose on the local network.
-#define MQTT_HOST IPAddress(XXX, XXX, XXX, XXX) // ← update to your host machine's IP
+#define MQTT_HOST IPAddress(192, 168, 1, 100) // ← update to your host machine's IP
 #define MQTT_PORT     1883

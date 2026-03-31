@@ -1,69 +1,86 @@
 [
     {
-        "id": "9c3d05193df0bfa6",
+        "id": "tab-sim",
         "type": "tab",
-        "label": "Flow 1",
+        "label": "Simulation Pipeline",
         "disabled": false,
-        "info": "",
-        "env": []
+        "info": ""
     },
     {
-        "id": "1026f3f8b26c6c60",
+        "id": "tab-hw",
+        "type": "tab",
+        "label": "Hardware Pipeline",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "a70eeb0346cd9ad7",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "mqtt-broker-sim",
         "type": "mqtt-broker",
-        "name": "MQTT broker",
-        "broker": "mosquitto",
-        "port": 1883,
+        "name": "EMQX Public Broker",
+        "broker": "broker.emqx.io",
+        "port": "1883",
         "clientid": "",
         "autoConnect": true,
         "usetls": false,
-        "protocolVersion": 4,
-        "keepalive": 60,
+        "protocolVersion": "4",
+        "keepalive": "60",
         "cleansession": true,
-        "autoUnsubscribe": true,
         "birthTopic": "",
         "birthQos": "0",
-        "birthRetain": "false",
         "birthPayload": "",
         "birthMsg": {},
         "closeTopic": "",
         "closeQos": "0",
-        "closeRetain": "false",
         "closePayload": "",
         "closeMsg": {},
         "willTopic": "",
         "willQos": "0",
-        "willRetain": "false",
         "willPayload": "",
         "willMsg": {},
         "userProps": "",
         "sessionExpiry": ""
     },
     {
-        "id": "51e07172cf2c7ce3",
+        "id": "mqtt-broker-hw",
         "type": "mqtt-broker",
-        "name": "External-MQQT-Broker",
-        "broker": "broker.emqx.io",
-        "port": 1883,
+        "name": "Mosquitto Local",
+        "broker": "mosquitto",
+        "port": "1883",
         "clientid": "",
         "autoConnect": true,
         "usetls": false,
-        "protocolVersion": 4,
-        "keepalive": 60,
+        "protocolVersion": "4",
+        "keepalive": "60",
         "cleansession": true,
-        "autoUnsubscribe": true,
         "birthTopic": "",
         "birthQos": "0",
-        "birthRetain": "false",
         "birthPayload": "",
         "birthMsg": {},
         "closeTopic": "",
         "closeQos": "0",
-        "closeRetain": "false",
         "closePayload": "",
         "closeMsg": {},
         "willTopic": "",
         "willQos": "0",
-        "willRetain": "false",
         "willPayload": "",
         "willMsg": {},
         "userProps": "",
@@ -90,53 +107,34 @@
         "allowInstall": false
     },
     {
-        "id": "a70eeb0346cd9ad7",
-        "type": "ui-theme",
-        "name": "Default Theme",
-        "colors": {
-            "surface": "#ffffff",
-            "primary": "#0094CE",
-            "bgPage": "#eeeeee",
-            "groupBg": "#ffffff",
-            "groupOutline": "#cccccc"
-        },
-        "sizes": {
-            "density": "default",
-            "pagePadding": "12px",
-            "groupGap": "12px",
-            "groupBorderRadius": "4px",
-            "widgetGap": "12px"
-        }
-    },
-    {
-        "id": "2e5e46f63fc0e516",
+        "id": "ui-page-sim",
         "type": "ui-page",
-        "name": "Page 1",
+        "name": "Simulation",
         "ui": "9f23e3e52e2e8b1b",
-        "path": "/page1",
+        "path": "/simulation",
         "icon": "home",
         "layout": "grid",
         "theme": "a70eeb0346cd9ad7",
         "breakpoints": [
             {
                 "name": "Default",
-                "px": 0,
-                "cols": 3
+                "px": "0",
+                "cols": "3"
             },
             {
                 "name": "Tablet",
-                "px": 576,
-                "cols": 6
+                "px": "576",
+                "cols": "6"
             },
             {
                 "name": "Small Desktop",
-                "px": 768,
-                "cols": 9
+                "px": "768",
+                "cols": "9"
             },
             {
                 "name": "Desktop",
-                "px": 1024,
-                "cols": 12
+                "px": "1024",
+                "cols": "12"
             }
         ],
         "order": 1,
@@ -145,148 +143,815 @@
         "disabled": "false"
     },
     {
-        "id": "201b61496aae32d4",
+        "id": "ui-page-hw",
+        "type": "ui-page",
+        "name": "Hardware",
+        "ui": "9f23e3e52e2e8b1b",
+        "path": "/hardware",
+        "icon": "cpu-64-bit",
+        "layout": "grid",
+        "theme": "a70eeb0346cd9ad7",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 2,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "ui-group-sim",
         "type": "ui-group",
-        "name": "Group 1",
-        "page": "2e5e46f63fc0e516",
-        "width": 6,
-        "height": 1,
+        "name": "Simulation Sensors",
+        "page": "ui-page-sim",
+        "width": "12",
+        "height": "1",
         "order": 1,
         "showTitle": true,
-        "className": "",
-        "visible": true,
-        "disabled": false,
-        "groupType": "default"
+        "className": ""
     },
     {
-        "id": "1d9899b81a03c3b0",
-        "type": "debug",
-        "z": "9c3d05193df0bfa6",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 380,
-        "y": 220,
-        "wires": []
-    },
-    {
-        "id": "5562b5849a9e2bf2",
-        "type": "mqtt in",
-        "z": "9c3d05193df0bfa6",
-        "name": "MQTT-Listener",
-        "topic": "#",
-        "qos": "2",
-        "datatype": "auto-detect",
-        "broker": "1026f3f8b26c6c60",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 180,
-        "y": 220,
-        "wires": [
-            [
-                "1d9899b81a03c3b0"
-            ]
-        ]
-    },
-    {
-        "id": "0e6e205c792306f2",
-        "type": "mqtt in",
-        "z": "9c3d05193df0bfa6",
-        "name": "",
-        "topic": "sipa/edge-pipeline/#",
-        "qos": "2",
-        "datatype": "auto-detect",
-        "broker": "51e07172cf2c7ce3",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 170,
-        "y": 300,
-        "wires": [
-            [
-                "b8f8a13d5c0f8a86"
-            ]
-        ]
-    },
-    {
-        "id": "b8f8a13d5c0f8a86",
-        "type": "debug",
-        "z": "9c3d05193df0bfa6",
-        "name": "debug 2",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 480,
-        "y": 300,
-        "wires": []
-    },
-    {
-        "id": "4fef1a0cab473326",
-        "type": "ui-button",
-        "z": "9c3d05193df0bfa6",
-        "group": "201b61496aae32d4",
-        "name": "",
-        "label": "button",
+        "id": "ui-group-hw",
+        "type": "ui-group",
+        "name": "Hardware Sensors",
+        "page": "ui-page-hw",
+        "width": "12",
+        "height": "1",
         "order": 1,
-        "width": 0,
-        "height": 0,
-        "emulateClick": false,
-        "tooltip": "",
-        "color": "",
-        "bgcolor": "",
-        "className": "",
+        "showTitle": true,
+        "className": ""
+    },
+    {
+        "id": "ui-group-sim-light",
+        "type": "ui-group",
+        "name": "Light",
+        "page": "ui-page-sim",
+        "width": "9",
+        "height": "1",
+        "order": 2,
+        "showTitle": true,
+        "className": ""
+    },
+    {
+        "id": "ui-group-sim-pump",
+        "type": "ui-group",
+        "name": "Water Pump Control",
+        "page": "ui-page-sim",
+        "width": "3",
+        "height": "1",
+        "order": 3,
+        "showTitle": true,
+        "className": ""
+    },
+    {
+        "id": "ui-group-hw-light",
+        "type": "ui-group",
+        "name": "Light",
+        "page": "ui-page-hw",
+        "width": "9",
+        "height": "1",
+        "order": 2,
+        "showTitle": true,
+        "className": ""
+    },
+    {
+        "id": "ui-group-hw-pump",
+        "type": "ui-group",
+        "name": "Water Pump Control",
+        "page": "ui-page-hw",
+        "width": "3",
+        "height": "1",
+        "order": 3,
+        "showTitle": true,
+        "className": ""
+    },
+    {
+        "id": "mqtt-in-sim",
+        "type": "mqtt in",
+        "z": "tab-sim",
+        "name": "MQTT SIM — sipa/edge-pipeline/sym/#",
+        "topic": "sipa/edge-pipeline/sym/#",
+        "qos": "0",
+        "datatype": "utf8",
+        "broker": "mqtt-broker-sim",
+        "nl": false,
+        "rap": false,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 120,
+        "wires": [
+            [
+                "fn-parse-sim"
+            ]
+        ]
+    },
+    {
+        "id": "fn-parse-sim",
+        "type": "function",
+        "z": "tab-sim",
+        "name": "Parse Topic (SIM)",
+        "func": "let parts = msg.topic.split(\"/\");\nmsg.environment = parts[2];\nmsg.sensor = parts[3];\nmsg.metric = parts[4];\nmsg.payload = Number(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 120,
+        "wires": [
+            [
+                "switch-sim"
+            ]
+        ]
+    },
+    {
+        "id": "switch-sim",
+        "type": "switch",
+        "z": "tab-sim",
+        "name": "Route SIM Metric",
+        "property": "metric",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "temp",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "hum",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "moisture",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "illuminance",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 4,
+        "x": 660,
+        "y": 120,
+        "wires": [
+            [
+                "gauge-sim-temp"
+            ],
+            [
+                "gauge-sim-hum"
+            ],
+            [
+                "gauge-sim-soil"
+            ],
+            [
+                "chart-sim-light"
+            ]
+        ]
+    },
+    {
+        "id": "gauge-sim-temp",
+        "type": "ui-gauge",
+        "z": "tab-sim",
+        "name": "Temperature °C",
+        "group": "ui-group-sim",
+        "order": 1,
+        "value": "payload",
+        "valueType": "msg",
+        "width": "3",
+        "height": "3",
+        "gtype": "gauge",
+        "gstyle": "needle",
+        "title": "Temperature",
+        "alwaysShowTitle": false,
+        "units": "°C",
         "icon": "",
-        "iconPosition": "left",
-        "payload": "",
-        "payloadType": "str",
-        "topic": "topic",
-        "topicType": "msg",
-        "buttonColor": "",
-        "textColor": "",
-        "iconColor": "",
-        "enableClick": true,
-        "enablePointerdown": false,
-        "pointerdownPayload": "",
-        "pointerdownPayloadType": "str",
-        "enablePointerup": false,
-        "pointerupPayload": "",
-        "pointerupPayloadType": "str",
-        "x": 250,
+        "prefix": "",
+        "suffix": "°C",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "30",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "40",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": 50,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 860,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "gauge-sim-hum",
+        "type": "ui-gauge",
+        "z": "tab-sim",
+        "name": "Humidity %",
+        "group": "ui-group-sim",
+        "order": 2,
+        "width": "3",
+        "height": "3",
+        "gtype": "gauge",
+        "gstyle": "needle",
+        "title": "Humidity",
+        "units": "%",
+        "icon": "",
+        "prefix": "",
+        "suffix": "%",
+        "segments": [
+            {
+                "color": "#5cd65c",
+                "from": 0
+            },
+            {
+                "color": "#ffc800",
+                "from": 60
+            },
+            {
+                "color": "#ea5353",
+                "from": 85
+            }
+        ],
+        "min": 0,
+        "max": 100,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 850,
         "y": 100,
         "wires": [
+            []
+        ]
+    },
+    {
+        "id": "gauge-sim-soil",
+        "type": "ui-gauge",
+        "z": "tab-sim",
+        "name": "Soil Moisture %",
+        "group": "ui-group-sim",
+        "order": 3,
+        "width": "3",
+        "height": "3",
+        "gtype": "gauge",
+        "gstyle": "needle",
+        "title": "Soil Moisture",
+        "units": "%",
+        "icon": "",
+        "prefix": "",
+        "suffix": "%",
+        "segments": [
+            {
+                "color": "#ea5353",
+                "from": 0
+            },
+            {
+                "color": "#ffc800",
+                "from": 20
+            },
+            {
+                "color": "#5cd65c",
+                "from": 40
+            }
+        ],
+        "min": 0,
+        "max": 100,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 860,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "266737c90e3aaa1e",
+        "type": "function",
+        "z": "tab-sim",
+        "name": "Build Pump Msg (SIM)",
+        "func": "msg.topic = \"sipa/edge-pipeline/sym/waterpump\";\nmsg.retain = false;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 240,
+        "wires": [
             [
-                "29ada6390e5b4b79"
+                "d521db56598c6a91"
             ]
         ]
     },
     {
-        "id": "29ada6390e5b4b79",
+        "id": "d521db56598c6a91",
         "type": "mqtt out",
-        "z": "9c3d05193df0bfa6",
-        "name": "Testing",
-        "topic": "sipa/edge-pipeline/sym/dht/temp",
-        "qos": "2",
-        "retain": "",
+        "z": "tab-sim",
+        "name": "Publish Pump CMD (SIM)",
+        "topic": "",
+        "qos": "1",
+        "retain": "false",
         "respTopic": "",
         "contentType": "",
         "userProps": "",
         "correl": "",
         "expiry": "",
-        "broker": "51e07172cf2c7ce3",
-        "x": 420,
-        "y": 100,
+        "broker": "mqtt-broker-sim",
+        "x": 630,
+        "y": 240,
         "wires": []
+    },
+    {
+        "id": "chart-sim-light",
+        "type": "ui-chart",
+        "z": "tab-sim",
+        "group": "ui-group-sim-light",
+        "name": "SIM Light Chart",
+        "label": "Light Level (%)",
+        "order": 1,
+        "chartType": "line",
+        "category": "Light",
+        "categoryType": "str",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "0",
+        "ymax": "100",
+        "bins": "",
+        "action": "append",
+        "stackSeries": false,
+        "pointRadius": "",
+        "showLegend": true,
+        "removeOlder": "5",
+        "removeOlderUnit": "1000",
+        "removeOlderPoints": "60",
+        "colors": [
+            "#f9c74f",
+            "#43aa8b",
+            "#577590",
+            "#f3722c",
+            "#f94144",
+            "#90be6d",
+            "#277da1",
+            "#4d908e",
+            "#f8961e"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "9",
+        "height": "4",
+        "className": "",
+        "interpolation": "linear",
+        "x": 860,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "switch-sim-pump",
+        "type": "ui-switch",
+        "z": "tab-sim",
+        "name": "SIM Water Pump",
+        "label": "Water Pump",
+        "group": "ui-group-sim-pump",
+        "order": 1,
+        "width": "3",
+        "height": "1",
+        "passthru": true,
+        "decouple": false,
+        "topic": "",
+        "topicType": "str",
+        "className": "",
+        "layout": "",
+        "clickableArea": "switch",
+        "onvalue": "on",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "#5cd65c",
+        "offvalue": "off",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "#ea5353",
+        "x": 110,
+        "y": 240,
+        "wires": [
+            [
+                "266737c90e3aaa1e"
+            ]
+        ]
+    },
+    {
+        "id": "mqtt-in-hw",
+        "type": "mqtt in",
+        "z": "tab-hw",
+        "name": "MQTT HW — sipa/edge-pipeline/hw/#",
+        "topic": "sipa/edge-pipeline/hw/#",
+        "qos": "0",
+        "datatype": "utf8",
+        "broker": "mqtt-broker-hw",
+        "nl": false,
+        "rap": false,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 120,
+        "wires": [
+            [
+                "fn-parse-hw"
+            ]
+        ]
+    },
+    {
+        "id": "fn-parse-hw",
+        "type": "function",
+        "z": "tab-hw",
+        "name": "Parse Topic (HW)",
+        "func": "let parts = msg.topic.split(\"/\");\nmsg.environment = parts[2];\nmsg.sensor = parts[3];\nmsg.metric = parts[4];\nmsg.payload = Number(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 120,
+        "wires": [
+            [
+                "switch-hw"
+            ]
+        ]
+    },
+    {
+        "id": "switch-hw",
+        "type": "switch",
+        "z": "tab-hw",
+        "name": "Route HW Metric",
+        "property": "metric",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "temp",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "hum",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "moisture",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "illuminance",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 4,
+        "x": 660,
+        "y": 120,
+        "wires": [
+            [
+                "gauge-hw-temp"
+            ],
+            [
+                "gauge-hw-hum"
+            ],
+            [
+                "gauge-hw-soil"
+            ],
+            [
+                "chart-hw-light"
+            ]
+        ]
+    },
+    {
+        "id": "gauge-hw-temp",
+        "type": "ui-gauge",
+        "z": "tab-hw",
+        "name": "Temperature °C",
+        "group": "ui-group-hw",
+        "order": 1,
+        "width": "3",
+        "height": "3",
+        "gtype": "gauge",
+        "gstyle": "needle",
+        "title": "Temperature",
+        "units": "°C",
+        "icon": "",
+        "prefix": "",
+        "suffix": "°C",
+        "segments": [
+            {
+                "color": "#5cd65c",
+                "from": 0
+            },
+            {
+                "color": "#ffc800",
+                "from": 30
+            },
+            {
+                "color": "#ea5353",
+                "from": 40
+            }
+        ],
+        "min": 0,
+        "max": 50,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 880,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "gauge-hw-hum",
+        "type": "ui-gauge",
+        "z": "tab-hw",
+        "name": "Humidity %",
+        "group": "ui-group-hw",
+        "order": 2,
+        "width": "3",
+        "height": "3",
+        "gtype": "gauge",
+        "gstyle": "needle",
+        "title": "Humidity",
+        "units": "%",
+        "icon": "",
+        "prefix": "",
+        "suffix": "%",
+        "segments": [
+            {
+                "color": "#5cd65c",
+                "from": 0
+            },
+            {
+                "color": "#ffc800",
+                "from": 60
+            },
+            {
+                "color": "#ea5353",
+                "from": 85
+            }
+        ],
+        "min": 0,
+        "max": 100,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 870,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "gauge-hw-soil",
+        "type": "ui-gauge",
+        "z": "tab-hw",
+        "name": "Soil Moisture %",
+        "group": "ui-group-hw",
+        "order": 3,
+        "width": "3",
+        "height": "3",
+        "gtype": "gauge",
+        "gstyle": "needle",
+        "title": "Soil Moisture",
+        "units": "%",
+        "icon": "",
+        "prefix": "",
+        "suffix": "%",
+        "segments": [
+            {
+                "color": "#ea5353",
+                "from": 0
+            },
+            {
+                "color": "#ffc800",
+                "from": 20
+            },
+            {
+                "color": "#5cd65c",
+                "from": 40
+            }
+        ],
+        "min": 0,
+        "max": 100,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 880,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "switch-hw-pump",
+        "type": "ui-switch",
+        "z": "tab-hw",
+        "name": "HW Water Pump",
+        "label": "Water Pump",
+        "group": "ui-group-hw-pump",
+        "order": 1,
+        "width": "3",
+        "height": "1",
+        "decouple": false,
+        "className": "",
+        "onvalue": "on",
+        "onvalueType": "str",
+        "oncolor": "#5cd65c",
+        "offvalue": "off",
+        "offvalueType": "str",
+        "offcolor": "#ea5353",
+        "x": 110,
+        "y": 240,
+        "wires": [
+            [
+                "5413452ae274a863"
+            ]
+        ]
+    },
+    {
+        "id": "5413452ae274a863",
+        "type": "function",
+        "z": "tab-hw",
+        "name": "Build Pump Msg (HW)",
+        "func": "msg.topic = \"sipa/edge-pipeline/hw/waterpump\";\nmsg.retain = false;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 240,
+        "wires": [
+            [
+                "d36148ce20a66d84"
+            ]
+        ]
+    },
+    {
+        "id": "d36148ce20a66d84",
+        "type": "mqtt out",
+        "z": "tab-hw",
+        "name": "Publish Pump CMD (HW)",
+        "topic": "",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "mqtt-broker-hw",
+        "x": 590,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "chart-hw-light",
+        "type": "ui-chart",
+        "z": "tab-hw",
+        "group": "ui-group-hw-light",
+        "name": "HW Light Chart",
+        "label": "Light Level (%)",
+        "order": 1,
+        "chartType": "line",
+        "category": "Light",
+        "categoryType": "str",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "0",
+        "ymax": "100",
+        "bins": "",
+        "action": "append",
+        "stackSeries": false,
+        "pointRadius": "",
+        "showLegend": true,
+        "removeOlder": "5",
+        "removeOlderUnit": "1000",
+        "removeOlderPoints": "60",
+        "colors": [
+            "#f9c74f",
+            "#43aa8b",
+            "#577590",
+            "#f3722c",
+            "#f94144",
+            "#90be6d",
+            "#277da1",
+            "#4d908e",
+            "#f8961e"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "9",
+        "height": "4",
+        "className": "",
+        "interpolation": "linear",
+        "x": 880,
+        "y": 200,
+        "wires": [
+            []
+        ]
     }
 ]

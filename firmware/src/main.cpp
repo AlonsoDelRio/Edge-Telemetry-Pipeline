@@ -23,6 +23,7 @@
  *   - DHT sensor library (Adafruit)
  *   - ESP32 Arduino core (FreeRTOS timers included)
  */
+// TODO: Implement automated water pump control logic based on soil moisture and temperature thresholds.
  #include <Arduino.h>
 #include <WiFi.h>
 extern "C" {
