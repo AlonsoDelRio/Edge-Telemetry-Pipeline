@@ -3,50 +3,103 @@
   "author": "Omar Alonso Del Rio Peralta",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-breadboard-half", "id": "bb2", "top": 112.2, "left": -352.4, "attrs": {} },
+    {
+      "type": "wokwi-breadboard-half",
+      "id": "bb2",
+      "top": 112.2,
+      "left": -275.6,
+      "attrs": { "color": "#eeefed" }
+    },
     {
       "type": "board-esp32-devkit-c-v4",
       "id": "esp",
-      "top": -105.6,
+      "top": -115.2,
       "left": -263.96,
       "attrs": {}
     },
-    { "type": "wokwi-dht22", "id": "dht1", "top": 48.3, "left": -120.6, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": 48.3, "left": -43.8, "attrs": {} },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 188.4,
+      "left": -130.6,
+      "attrs": { "color": "blue" }
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay1",
+      "top": 303.8,
+      "left": -237.2,
+      "rotate": 90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text1",
+      "top": 163.2,
+      "left": -460.8,
+      "attrs": { "text": "YL-69 SOIL_SENSOR" }
+    },
+    {
+      "type": "wokwi-photoresistor-sensor",
+      "id": "ldr1",
+      "top": 323.3,
+      "left": -72.5,
+      "rotate": 270,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-slide-potentiometer",
+      "id": "pot2",
+      "top": 177.8,
+      "left": -481,
+      "attrs": { "travelLength": "30" }
+    },
     {
       "type": "wokwi-resistor",
       "id": "r1",
-      "top": 176.75,
-      "left": -153.6,
-      "attrs": { "value": "10000" }
-    },
-    { "type": "wokwi-led", "id": "led1", "top": 44.4, "left": 61.4, "attrs": { "color": "blue" } },
-    { "type": "wokwi-relay-module", "id": "relay1", "top": 105.8, "left": 0, "attrs": {} }
+      "top": 234.65,
+      "left": -174.2,
+      "rotate": 180,
+      "attrs": { "value": "330" }
+    }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
     [ "esp:RX", "$serialMonitor:TX", "", [] ],
     [ "bb2:24t.b", "bb2:tp.18", "red", [ "h-19.2", "v-48.3" ] ],
-    [ "bb2:19t.b", "bb2:tp.16", "red", [ "v0" ] ],
-    [ "esp:4", "bb2:25t.d", "gold", [ "h28.8", "v163.2" ] ],
-    [ "bb2:tn.11", "bb2:14t.a", "black", [ "v0" ] ],
-    [ "relay1:VCC", "bb2:tp.25", "red", [ "v-19.5" ] ],
-    [ "relay1:GND", "bb2:tn.25", "black", [ "h0" ] ],
     [ "bb2:27t.b", "bb2:tn.24", "black", [ "h19.2", "v-38.3" ] ],
+    [ "esp:GND.1", "bb2:tn.4", "black", [ "h-9.45", "v67.2", "h56" ] ],
+    [ "bb2:bn.4", "bb2:9b.i", "black", [ "v0" ] ],
+    [ "bb2:bp.3", "bb2:10b.h", "red", [ "v0" ] ],
+    [ "bb2:8b.f", "esp:25", "green", [ "v-9.6", "h-38.4", "v-105.6", "h-57.6", "v-124.8" ] ],
     [ "dht1:VCC", "bb2:24t.a", "", [ "$bb" ] ],
     [ "dht1:SDA", "bb2:25t.a", "", [ "$bb" ] ],
     [ "dht1:NC", "bb2:26t.a", "", [ "$bb" ] ],
     [ "dht1:GND", "bb2:27t.a", "", [ "$bb" ] ],
-    [ "r1:1", "bb2:19t.c", "", [ "$bb" ] ],
-    [ "r1:2", "bb2:25t.c", "", [ "$bb" ] ],
-    [ "relay1:IN", "esp:22", "green", [ "h-9.6", "v-201.8" ] ],
-    [ "relay1:COM", "bb2:bp.25", "red", [ "h39.6", "v162.7" ] ],
-    [ "bb2:tp.1", "bb2:bp.1", "red", [ "v0" ] ],
-    [ "esp:5V", "bb2:tp.5", "red", [ "h0" ] ],
-    [ "esp:GND.1", "bb2:tn.4", "black", [ "h0" ] ],
-    [ "bb2:tn.2", "bb2:bn.2", "black", [ "v0" ] ],
-    [ "relay1:NC", "bb2:bn.25", "black", [ "h30", "v182.5" ] ],
-    [ "relay1:NO", "led1:A", "blue", [ "h20.4", "v-59.4", "h-48" ] ],
-    [ "led1:C", "relay1:NC", "black", [ "h0.4", "v9.6", "h37.2" ] ]
+    [ "bb2:bp.20", "bb2:27b.i", "red", [ "v0" ] ],
+    [ "bb2:bn.19", "bb2:28b.h", "black", [ "v0" ] ],
+    [ "bb2:30b.f", "esp:34", "violet", [ "v-9.6", "h19.2", "v-355.2", "h-326.4", "v86.4" ] ],
+    [ "esp:35", "pot2:SIG", "orange", [ "h-239.85", "v269.6" ] ],
+    [ "bb2:tp.2", "bb2:bp.2", "red", [ "v0" ] ],
+    [ "bb2:tn.1", "bb2:bn.1", "black", [ "v0" ] ],
+    [ "bb2:tp.1", "pot2:VCC", "red", [ "h-248", "v96.3" ] ],
+    [ "esp:3V3", "bb2:tp.10", "red", [ "h-9.45", "v-38.4", "h124.8" ] ],
+    [ "esp:18", "bb2:25t.c", "gold", [ "h105.6", "v144" ] ],
+    [ "ldr1:VCC", "bb2:27b.j", "", [ "$bb" ] ],
+    [ "ldr1:GND", "bb2:28b.j", "", [ "$bb" ] ],
+    [ "ldr1:DO", "bb2:29b.j", "", [ "$bb" ] ],
+    [ "ldr1:AO", "bb2:30b.j", "", [ "$bb" ] ],
+    [ "relay1:VCC", "bb2:10b.j", "", [ "$bb" ] ],
+    [ "relay1:GND", "bb2:9b.j", "", [ "$bb" ] ],
+    [ "relay1:IN", "bb2:8b.j", "", [ "$bb" ] ],
+    [ "relay1:COM", "bb2:bp.11", "red", [ "v20.4", "h49.4" ] ],
+    [ "r1:1", "bb2:15b.g", "", [ "$bb" ] ],
+    [ "r1:2", "bb2:9b.g", "", [ "$bb" ] ],
+    [ "led1:A", "bb2:16b.f", "", [ "$bb" ] ],
+    [ "led1:C", "bb2:15b.f", "", [ "$bb" ] ],
+    [ "relay1:NO", "bb2:16b.g", "green", [ "v30", "h69" ] ],
+    [ "bb2:bn.2", "pot2:GND", "black", [ "v8.3", "h-46.4" ] ]
   ],
   "dependencies": {}
 }

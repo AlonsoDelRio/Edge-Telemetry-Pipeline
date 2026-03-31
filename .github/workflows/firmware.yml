@@ -1,0 +1,45 @@
+name: Firmware Continuous Integration
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'firmware/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'firmware/**'
+
+jobs:
+  build-esp32:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-platformio
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PlatformIO
+        run: pip install -U platformio
+
+      - name: Prepare Secrets for CI
+        run: cp firmware/src/config/secrets.example.h firmware/src/config/secrets.h
+
+      - name: Build Firmware (All Environments)
+        run: pio run -d firmware

@@ -23,47 +23,32 @@
  *   - DHT sensor library (Adafruit)
  *   - ESP32 Arduino core (FreeRTOS timers included)
  */
-#include <Arduino.h>
+// TODO: Implement automated water pump control logic based on soil moisture and temperature thresholds.
+ #include <Arduino.h>
 #include <WiFi.h>
 extern "C" {
   #include "freertos/FreeRTOS.h"
   #include "freertos/timers.h"
-}
+  }
 #include <AsyncMqttClient.h>
 #include "DHT.h"
+#include "config/config.h"
 
-// WIFI Conection
-#define WIFI_SSID "Wokwi-GUEST"
-#define WIFI_PASSWORD ""
-
-// MQTT Mosquitto Broker
-// For a cloud MQTT broker, type the domain name or IP
-//#define MQTT_HOST IPAddress(XXX, XXX, XXX, XXX)
-#define MQTT_HOST "broker.emqx.io"
-#define MQTT_PORT 1883
-
-// MQTT Suscribe topics
-static const char* MQTT_SUB_WATERPUMP = "sipa/edge-pipeline/sym/waterpump";
-
-// MQTT publish topics
-static const char* MQTT_PUB_DHT_TEMP  = "sipa/edge-pipeline/sym/dht/temp";
-static const char* MQTT_PUB_DHT_HUM   = "sipa/edge-pipeline/sym/dht/hum";
+// Actuators
+static const uint8_t WATERPUMP_PIN = 25;
 
 AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
 
-
-// Sensors
-static const uint8_t DHT_PIN  = 4;  
-#define DHTTYPE DHT22
-
-// Actuators
-static const uint8_t PIN_LED_BLUE   = 2;  // LED de estado (incorporado)
-static const uint8_t PIN_WATERPUMP = 22; // Control de bomba de agua
-
 // Objects initializer
 DHT dht(DHT_PIN, DHTTYPE);
+// raw ADC reading for soil sensor max and min
+#define SOIL_DRY_VALUE 3200 
+#define SOIL_WET_VALUE 1200
+// raw ADC reading for light sensor max and min
+#define NIGHT_LIGHT_VALUE 4095
+#define SUN_LIGHT_VALUE 200 
 
 void connectToWifi() {
   Serial.printf("Connecting to %s \r\n", WIFI_SSID);
@@ -94,7 +79,6 @@ void WiFiEvent(WiFiEvent_t event) {
   }
 }
 
-// Add more topics that want your ESP to be subscribed to
 void onMqttConnect(bool sessionPresent) {
   Serial.println("Connected to MQTT.");
   Serial.print("Session present: ");
@@ -122,16 +106,14 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     //Serial.print((char)payload[i]);
     messageTemp += (char)payload[i];
   }
-  // Check if the MQTT message was received on topic LED
+  // Check if the MQTT message was received on topic WaterPump
   if (strcmp(topic, MQTT_SUB_WATERPUMP) == 0) {
     Serial.println(messageTemp);
     if(messageTemp == "on") {
-      digitalWrite(PIN_WATERPUMP, HIGH);
-      digitalWrite(PIN_LED_BLUE, HIGH);
+      digitalWrite(WATERPUMP_PIN, HIGH);
     }
     if(messageTemp == "off"){
-      digitalWrite(PIN_WATERPUMP, LOW);
-      digitalWrite(PIN_LED_BLUE, LOW);
+      digitalWrite(WATERPUMP_PIN, LOW);
 
     }
   }
@@ -139,30 +121,48 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
               topic, messageTemp.c_str(), properties.qos, properties.dup, properties.retain, len);
 }
 
+int soil_readPercent() {
+    int raw = analogRead(SOIL_SENSOR_PIN);
+
+    // Clamp to calibrated range to avoid out-of-bound percentages.
+    raw = constrain(raw, SOIL_WET_VALUE, SOIL_DRY_VALUE);
+
+    // Map: DRY (high ADC) → 0%, WET (low ADC) → 100%
+    return map(raw, SOIL_DRY_VALUE, SOIL_WET_VALUE, 0, 100);
+}
+
+int light_readPercent() {
+    int raw = analogRead(LIGHT_SENSOR_PIN);
+
+    // Clamp to calibrated range to avoid out-of-bound percentages.
+    raw = constrain(raw, SUN_LIGHT_VALUE, NIGHT_LIGHT_VALUE);
+
+    // Map: NIGHT (high ADC) → 0%, SUNNY (low ADC) → 100%
+    return map(raw, NIGHT_LIGHT_VALUE, SUN_LIGHT_VALUE, 0, 100);
+}
+
 // Variables
-float dht_temp; 
-float dht_hum;
+float dht_temp, dht_hum;
+int soil_hum, light_level;
 unsigned long previousMillis = 0;   // Stores last time temperature was published
 const long interval = 2000;         // Interval at which to publish sensor readings
 
 void setup() {
   Serial.begin(115200);
   Serial.println();
-
-  pinMode(PIN_LED_BLUE, OUTPUT);
-  digitalWrite(PIN_LED_BLUE, LOW);
-
   WiFi.onEvent(WiFiEvent);
-
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
-  //mqttClient.onSubscribe(onMqttSubscribe);
-  //mqttClient.onPublish(onMqttPublish);
   mqttClient.onMessage(onMqttMessage);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
   // If your broker requires authentication (username and password), set them below
   //mqttClient.setCredentials(MQTT_USERNAME, MQTT_PASSWORD);
   connectToWifi();
+  dht.begin();
+  pinMode(SOIL_SENSOR_PIN, INPUT);
+  pinMode(LIGHT_SENSOR_PIN, INPUT);
+  pinMode(WATERPUMP_PIN, OUTPUT);
+  digitalWrite(WATERPUMP_PIN, LOW);
 }
 
 void loop() {
@@ -172,12 +172,11 @@ void loop() {
   if (currentMillis - previousMillis >= interval) {
     // Save the last time a new reading was published
     previousMillis = currentMillis;
-    // New DHT sensor readings
+    // Read temperature as Celsius, humidity and enviroment metrics
     dht_hum = dht.readHumidity();
-    // Read temperature as Celsius (the default)
     dht_temp = dht.readTemperature();
-    // Read temperature as Fahrenheit (isFahrenheit = true)
-    //temp = dht.readTemperature(true);
+    soil_hum = soil_readPercent();
+    light_level = light_readPercent();
 
     // Check if any reads failed and exit early (to try again).
     if (isnan(dht_temp) || isnan(dht_hum)) {
@@ -185,14 +184,25 @@ void loop() {
       return;
     }
     
-    // Publish an MQTT message on topic esp32/dht/temperature
-    uint16_t packetIdPub1 = mqttClient.publish(MQTT_PUB_DHT_TEMP, 1, true, String(dht_temp).c_str());                            
-    Serial.printf("Publishing on topic %s at QoS 1, packetId: %i \r\n", MQTT_PUB_DHT_TEMP, packetIdPub1);
+    // Publish an MQTT message on topic sipa/edge-pipeline/sym/dht/temperature
+    uint16_t dht_temp_packetID = mqttClient.publish(MQTT_PUB_DHT_TEMP, 1, true, String(dht_temp).c_str());                            
+    Serial.printf("Publishing on topic %s at QoS 1, packetID: %i \r\n", MQTT_PUB_DHT_TEMP, dht_temp_packetID);
     Serial.printf("Message: %.2f \r\n", dht_temp);
 
-    // Publish an MQTT message on topic esp32/dht/humidity
-    uint16_t packetIdPub2 = mqttClient.publish(MQTT_PUB_DHT_HUM, 1, true, String(dht_hum).c_str());                            
-    Serial.printf("Publishing on topic %s at QoS 1, packetId: %i \r\n", MQTT_PUB_DHT_HUM, packetIdPub2);
+    // Publish an MQTT message on topic sipa/edge-pipeline/sym/dht/humidity
+    uint16_t dht_hum_packetID = mqttClient.publish(MQTT_PUB_DHT_HUM, 1, true, String(dht_hum).c_str());                            
+    Serial.printf("Publishing on topic %s at QoS 1, packetID: %i \r\n", MQTT_PUB_DHT_HUM, dht_hum_packetID);
     Serial.printf("Message: %.2f \r\n", dht_hum);
+
+    // Publish an MQTT message on topic sipa/edge-pipeline/sym/soil/hum
+    uint16_t soil_hum_packetID = mqttClient.publish(MQTT_PUB_SOIL_HUM, 1, true, String(soil_hum).c_str());                            
+    Serial.printf("Publishing on topic %s at QoS 1, packetID: %i \r\n", MQTT_PUB_SOIL_HUM, soil_hum_packetID);
+    Serial.printf("Message: %d \r\n", soil_hum);
+
+    // Publish an MQTT message on topic sipa/edge-pipeline/sym/light
+    uint16_t light_level_packetID = mqttClient.publish(MQTT_PUB_LIGHT_LEVEL, 1, true, String(light_level).c_str());                            
+    Serial.printf("Publishing on topic %s at QoS 1, packetID: %i \r\n", MQTT_PUB_LIGHT_LEVEL, light_level_packetID);
+    Serial.printf("Message: %d \r\n", light_level);
   }
+  
 }

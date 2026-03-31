@@ -19,6 +19,7 @@ firmware/.vscode/*
 firmware/include/
 firmware/lib/
 firmware/test/
+firmware/src/config/secrets.h
 
 # --- Reserved documentation ---
 docs/
