@@ -1,0 +1,14 @@
+{
+  "name": "edge-telemetry-pipeline-nodered",
+  "description": "Custom Node-RED instance for edge telemetry routing and processing",
+  "version": "1.0.0",
+  "private": true,
+  "author": "Omar Alonso Del Rio Peralta",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "node-red-contrib-influxdb": "^0.7.0",
+    "@flowfuse/node-red-dashboard": "^1.30.2"
+  }
+}
