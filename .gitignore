@@ -12,6 +12,13 @@ docker/nodered/data/node_modules/
 docker/nodered/data/.*
 docker/nodered/data/flows_cred.json
 
+# --- Influxdb ---
+docker/secrets/env.influxdb
+docker/influxdb/config/*
+!docker/influxdb/config/.gitkeep
+docker/influxdb/data/*
+!docker/influxdb/data/.gitkeep
+
 # --- Firmware (PlatformIO) ---
 firmware/.pio/       
 firmware/.vscode/*   
