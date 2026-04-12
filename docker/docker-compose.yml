@@ -25,6 +25,7 @@ services:
       - "1880:1880" # Puerto de la interfaz web
     volumes:
       - ./nodered/data:/data # Para que tus flujos no se borren al apagar
+      - /data/node_modules
     restart: unless-stopped
 
   influxdb:
