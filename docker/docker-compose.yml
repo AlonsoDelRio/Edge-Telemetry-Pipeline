@@ -26,6 +26,11 @@ services:
     volumes:
       - ./nodered/data:/data # Para que tus flujos no se borren al apagar
       - /data/node_modules
+    env_file:
+      - .env
+    environment:
+      - INFLUX_ORG=${INFLUXDB_ORG} 
+      - INFLUX_TOKEN=${INFLUXDB_TOKEN}
     restart: unless-stopped
 
   influxdb:
@@ -36,13 +41,16 @@ services:
     volumes:
       - ./influxdb/data:/var/lib/influxdb2
       - ./influxdb/config:/etc/influxdb2
-    environment:
-      DOCKER_INFLUXDB_INIT_MODE: setup
-      DOCKER_INFLUXDB_INIT_ORG: edge-pipeline
-      DOCKER_INFLUXDB_INIT_BUCKET: telemetry
-      DOCKER_INFLUXDB_INIT_RETENTION: 48h
+      - ./influxdb/setup-buckets.sh:/docker-entrypoint-initdb.d/setup-buckets.sh
     env_file:
-      - ./secrets/env.influxdb
+      - .env
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=system_metrics
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
       interval: 30s
