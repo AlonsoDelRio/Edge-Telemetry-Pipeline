@@ -6,8 +6,6 @@ docker/mosquitto/log/
 docker/nodered/data/*
 !docker/nodered/data/flows.json
 !docker/nodered/data/package.json
-
-# Nos aseguramos de que los backups y credenciales sigan ignorados
 docker/nodered/data/lib/
 docker/nodered/data/node_modules/
 docker/nodered/data/.*
@@ -19,6 +17,9 @@ docker/influxdb/config/*
 !docker/influxdb/config/.gitkeep
 docker/influxdb/data/*
 !docker/influxdb/data/.gitkeep
+
+# --- Docker credentials ---
+docker/.env
 
 # --- Firmware (PlatformIO) ---
 firmware/.pio/       
