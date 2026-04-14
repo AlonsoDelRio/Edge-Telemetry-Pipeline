@@ -1,0 +1,14 @@
+apiVersion: 1
+
+providers:
+  - name: SIPA Telemetry Dashboards
+    orgId: 1
+    type: file
+    disableDeletion: true      # Don't delete dashboards if JSON is removed
+    updateIntervalSeconds: 30  # Grafana polls for JSON changes every 30s
+                               # (useful during development — edit JSON, see changes)
+    allowUiUpdates: false      # Dashboard edits must go through the JSON file,
+                               # not the UI — enforces config-as-code discipline
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: true  # Subfolders in dashboards/ become Grafana folders
