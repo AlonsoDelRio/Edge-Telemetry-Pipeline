@@ -1,45 +1,65 @@
-name: Firmware Continuous Integration
+name: Firmware CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'firmware/**'
+      - "firmware/**"
+      - ".github/workflows/firmware-ci.yml"
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'firmware/**'
+      - "firmware/**"
+      - ".github/workflows/firmware-ci.yml"
+
+concurrency:
+  group: firmware-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-esp32:
+  build:
+    name: Build Firmware (ESP32)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-
-      - name: Cache PlatformIO
-        uses: actions/cache@v4
-        with:
-          path: ~/.platformio
-          key: ${{ runner.os }}-platformio
-
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
+
+      - name: Cache PlatformIO environment
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+            .pio/libdeps
+          key: ${{ runner.os }}-platformio-${{ hashFiles('**/platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-platformio-
 
       - name: Install PlatformIO
         run: pip install -U platformio
 
-      - name: Prepare Secrets for CI
-        run: cp firmware/src/config/secrets.example.h firmware/src/config/secrets.h
+      - name: Prepare build secrets (CI placeholder)
+        run: |
+          cp firmware/src/config/secrets.example.h firmware/src/config/secrets.h
+          ## Replace the IP address using sed
+          sed -i 's/IPAddress(192, 168, 1, 100)/IPAddress(127, 0, 0, 1)/g' firmware/src/config/secrets.h
 
-      - name: Build Firmware (All Environments)
-        run: pio run -d firmware
+      - name: Build Firmware with Strict Mode and Version Injection
+        # Inject GitHub SHA to track which commit is running on the device.
+        run: |
+          export PLATFORMIO_BUILD_FLAGS="-D VERSION_TAG=\\\"${{ github.sha }}\\\" -Werror"
+          pio run -d firmware -s
+
+      - name: Upload firmware binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ github.sha }}
+          path: firmware/.pio/build/**/*.bin
+          retention-days: 30
+          if-no-files-found: error
