@@ -19,7 +19,7 @@ services:
     build: ./nodered  # Docker buscará el 'Dockerfile' dentro de esa carpeta
     container_name: nodered-container
     depends_on:
-      mosquitto :
+      mosquitto:
         condition: service_started
       influxdb:
         condition: service_healthy
@@ -31,7 +31,7 @@ services:
     env_file:
       - .env
     environment:
-      - INFLUX_ORG=${INFLUXDB_ORG} 
+      - INFLUX_ORG=${INFLUXDB_ORG}
       - INFLUX_TOKEN=${INFLUXDB_TOKEN}
     networks:
       - telemetry-net

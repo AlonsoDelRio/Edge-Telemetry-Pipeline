@@ -22,8 +22,8 @@ docker/influxdb/data/*
 docker/.env
 
 # --- Firmware (PlatformIO) ---
-firmware/.pio/       
-firmware/.vscode/*   
+firmware/.pio/
+firmware/.vscode/*
 !firmware/.vscode/extensions.json
 firmware/include/
 firmware/lib/
