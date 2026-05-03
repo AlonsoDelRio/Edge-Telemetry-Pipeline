@@ -82,6 +82,14 @@ jobs:
           EOF
           fi
 
+      - name: Set volume permissions for CI runner
+        run: |
+          mkdir -p docker/nodered/data
+          mkdir -p docker/mosquitto/data
+          mkdir -p docker/mosquitto/log
+          sudo chown -R 1000:1000 docker/nodered/data
+          sudo chmod -R 775 docker/nodered/data
+
       - name: Start Docker stack and wait for healthy state
         run: |
           docker compose -f docker/docker-compose.yml up -d --wait --wait-timeout 90
@@ -96,7 +104,7 @@ jobs:
             --filter "status=exited" \
             --filter "status=restarting" \
             --format "{{.Service}}: {{.Status}}")
-          
+
           if [ -z "$FAILED_SERVICES" ]; then
             echo "All services are healthy and running."
           else

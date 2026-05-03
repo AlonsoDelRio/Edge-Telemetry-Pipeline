@@ -43,6 +43,14 @@ jobs:
           EOF
           fi
 
+      - name: Set volume permissions for CI runner
+        run: |
+          mkdir -p docker/nodered/data
+          mkdir -p docker/mosquitto/data
+          mkdir -p docker/mosquitto/log
+          sudo chown -R 1000:1000 docker/nodered/data
+          sudo chmod -R 775 docker/nodered/data
+
       - name: Start full Docker stack
         run: |
           docker compose -f docker/docker-compose.yml up -d --wait --wait-timeout 120
