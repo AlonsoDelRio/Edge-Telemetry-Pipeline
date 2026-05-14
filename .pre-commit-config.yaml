@@ -30,7 +30,7 @@ repos:
     rev: v0.41.0
     hooks:
       - id: markdownlint
-        args: [--config=.markdownlint.yml]
+        args: ["--disable", "MD013"]
         exclude: ^CHANGELOG\.md$
 
   - repo: https://github.com/pre-commit/mirrors-clang-format

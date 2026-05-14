@@ -31,5 +31,5 @@ firmware/test/
 firmware/src/config/secrets.h
 
 # --- Reserved documentation ---
-docs/
+docs/etc/
 simulation/
