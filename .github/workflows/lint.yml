@@ -1,0 +1,81 @@
+name: Lint & Code Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+  workflow_dispatch:
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    name: Pre-commit Hooks (YAML, Shell, Markdown, Secrets)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run pre-commit hooks
+        uses: pre-commit/action@v3.0.1
+
+  firmware-lint:
+    name: Firmware Static Analysis (cppcheck)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq cppcheck
+
+      - name: Run cppcheck on firmware source
+        run: |
+          cppcheck \
+            --error-exitcode=1 \
+            --enable=warning,performance,portability \
+            --suppress=missingIncludeSystem \
+            --inline-suppr \
+            --std=c++17 \
+            firmware/src/ \
+            2>&1 | tee /tmp/cppcheck-report.txt
+
+          # Summary
+          ERROR_COUNT=$(grep -c "\[error\]" /tmp/cppcheck-report.txt || true)
+          WARN_COUNT=$(grep -c "\[warning\]" /tmp/cppcheck-report.txt || true)
+          echo "=== cppcheck summary: $ERROR_COUNT errors, $WARN_COUNT warnings ==="
+
+          if [ $((ERROR_COUNT + WARN_COUNT)) -gt 0 ]; then
+            echo "Cppcheck found warnings or errors."
+            exit 1
+          fi
+          echo "No errors or warnings found."
+
+  secret-scan:
+    name: Secret Scanning (TruffleHog)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history required for trufflehog to scan all commits
+
+      - name: Scan for secrets in git history
+        uses: trufflesecurity/trufflehog@v3.74.0
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified

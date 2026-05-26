@@ -1,0 +1,113 @@
+name: Integration CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: integration-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke-test:
+    name: Full Stack Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install MQTT test client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq mosquitto-clients netcat-openbsd
+
+      - name: Prepare CI environment file
+        run: |
+          if [ -f docker/.env.example ]; then
+            cp docker/.env.example docker/.env
+          else
+            cat > docker/.env << 'EOF'
+          # Minimal CI environment — placeholders only
+          INFLUXDB_USERNAME=ci_influx_admin
+          INFLUXDB_PASSWORD=ci_password_placeholder
+          INFLUXDB_TOKEN=ci_token_placeholder
+          INFLUXDB_BUCKET_SIM=sim_telemetry
+          INFLUXDB_BUCKET_HW=hw_telemetry
+          INFLUXDB_ORG=ci_org
+          GRAFANA_ADMIN_USER=ci_grafana_admin
+          GRAFANA_ADMIN_PASSWORD=ci_grafana_psw
+          HOST_IP=127.0.0.1
+          EOF
+          fi
+
+      - name: Set volume permissions for CI runner
+        run: |
+          mkdir -p docker/nodered/data
+          mkdir -p docker/mosquitto/data
+          mkdir -p docker/mosquitto/log
+          sudo chown -R 1000:1000 docker/nodered/data
+          sudo chmod -R 775 docker/nodered/data
+
+      - name: Start full Docker stack
+        run: |
+          docker compose -f docker/docker-compose.yml up -d --wait --wait-timeout 120
+
+      - name: Verify MQTT Port Accessibility
+        run: |
+          MQTT_PORT=1883
+          echo "Checking if MQTT port $MQTT_PORT is accepting connections..."
+          nc -zv localhost $MQTT_PORT || { echo "MQTT port is closed"; exit 1; }
+
+      - name: MQTT broker connectivity smoke test
+        run: |
+          MQTT_HOST="localhost"
+          MQTT_PORT="1883"
+          TEST_TOPIC="ci/integration/smoke"
+          TEST_PAYLOAD="integration-test-$(date +%s)"
+
+          echo "=== Testing MQTT broker at $MQTT_HOST:$MQTT_PORT ==="
+
+          # Subscribe in background, wait up to 5 seconds for a message
+          mosquitto_sub \
+            -h "$MQTT_HOST" \
+            -p "$MQTT_PORT" \
+            -t "$TEST_TOPIC" \
+            -C 1 \
+            -W 5 > /tmp/mqtt_received.txt 2>&1 &
+          SUB_PID=$!
+          # Brief pause to let subscriber connect before publishing
+          sleep 1
+
+          # Publish the test message
+          mosquitto_pub \
+            -h "$MQTT_HOST" \
+            -p "$MQTT_PORT" \
+            -t "$TEST_TOPIC" \
+            -m "$TEST_PAYLOAD"
+
+          # Wait for subscriber to receive and exit
+          wait $SUB_PID
+          RECEIVED=$(cat /tmp/mqtt_received.txt)
+
+          echo "Expected: $TEST_PAYLOAD"
+          echo "Received: $RECEIVED"
+
+          if [ "$RECEIVED" = "$TEST_PAYLOAD" ]; then
+            echo "MQTT round-trip successful"
+          else
+            echo "MQTT smoke test failed — broker is not relaying messages"
+            exit 1
+          fi
+
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "=== Integration test failed — collecting diagnostic logs ==="
+          docker compose -f docker/docker-compose.yml logs --no-color
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose -f docker/docker-compose.yml down -v

@@ -1,0 +1,13 @@
+---
+Language: Cpp
+BasedOnStyle: Google
+ColumnLimit: 120
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+
+
+PointerAlignment: Right
+IndentCaseLabels: true
+IndentPPDirectives: BeforeHash
+Standard: Latest

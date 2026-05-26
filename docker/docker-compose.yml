@@ -10,6 +10,8 @@ services:
       - ./mosquitto/config:/mosquitto/config # Para guardar tu configuración
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
+    networks:
+      - telemetry-net
     restart: unless-stopped
 
   # Servicio 2: Node-RED
@@ -17,9 +19,82 @@ services:
     build: ./nodered  # Docker buscará el 'Dockerfile' dentro de esa carpeta
     container_name: nodered-container
     depends_on:
-      - mosquitto # Espera a que el broker encienda primero
+      mosquitto:
+        condition: service_started
+      influxdb:
+        condition: service_healthy
     ports:
       - "1880:1880" # Puerto de la interfaz web
     volumes:
       - ./nodered/data:/data # Para que tus flujos no se borren al apagar
+      - /data/node_modules
+    env_file:
+      - .env
+    environment:
+      - INFLUX_ORG=${INFLUXDB_ORG}
+      - INFLUX_TOKEN=${INFLUXDB_TOKEN}
+    networks:
+      - telemetry-net
     restart: unless-stopped
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb/data:/var/lib/influxdb2
+      - ./influxdb/config:/etc/influxdb2
+      - ./influxdb/setup-buckets.sh:/docker-entrypoint-initdb.d/setup-buckets.sh
+    env_file:
+      - .env
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=system_metrics
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - telemetry-net
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: grafana
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    ports:
+      - "3000:3000"   # LAN-accessible dashboard UI
+    volumes:
+      # Provisioning-as-code: datasources and dashboards auto-load on startup
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      # Dashboard JSON files Grafana will import automatically
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      # Named volume for Grafana's internal state (users, annotations, etc.)
+      - grafana-storage:/var/lib/grafana
+    env_file:
+      - .env
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      # Tell Grafana where it will be accessed from
+      - GF_SERVER_ROOT_URL=http://${HOST_IP}:3000
+    networks:
+      - telemetry-net
+    restart: unless-stopped
+
+networks:
+  telemetry-net:
+    driver: bridge
+
+volumes:
+  grafana-storage:

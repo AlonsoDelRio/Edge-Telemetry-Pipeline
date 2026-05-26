@@ -5,16 +5,25 @@ docker/mosquitto/log/
 # --- Node-RED ---
 docker/nodered/data/*
 !docker/nodered/data/flows.json
-
-# Nos aseguramos de que los backups y credenciales sigan ignorados
+!docker/nodered/data/package.json
 docker/nodered/data/lib/
 docker/nodered/data/node_modules/
 docker/nodered/data/.*
 docker/nodered/data/flows_cred.json
 
+# --- Influxdb ---
+docker/secrets/env.influxdb
+docker/influxdb/config/*
+!docker/influxdb/config/.gitkeep
+docker/influxdb/data/*
+!docker/influxdb/data/.gitkeep
+
+# --- Docker credentials ---
+docker/.env
+
 # --- Firmware (PlatformIO) ---
-firmware/.pio/       
-firmware/.vscode/*   
+firmware/.pio/
+firmware/.vscode/*
 !firmware/.vscode/extensions.json
 firmware/include/
 firmware/lib/
@@ -22,5 +31,5 @@ firmware/test/
 firmware/src/config/secrets.h
 
 # --- Reserved documentation ---
-docs/
+docs/etc/
 simulation/

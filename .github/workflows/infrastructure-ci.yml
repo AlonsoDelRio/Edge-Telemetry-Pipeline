@@ -1,0 +1,123 @@
+name: Infrastructure CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docker/**"
+      - ".github/workflows/infrastructure-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docker/**"
+      - ".github/workflows/infrastructure-ci.yml"
+
+concurrency:
+  group: infrastructure-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate Docker Compose Configuration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare CI environment file
+        run: |
+          if [ -f docker/.env.example ]; then
+            cp docker/.env.example docker/.env
+            echo ".env created from .env.example"
+          else
+            echo "No .env.example found — creating minimal CI .env"
+            cat > docker/.env << 'EOF'
+          # Minimal CI environment — placeholders only
+          INFLUXDB_USERNAME=ci_influx_admin
+          INFLUXDB_PASSWORD=ci_password_placeholder
+          INFLUXDB_TOKEN=ci_token_placeholder
+          INFLUXDB_BUCKET_SIM=sim_telemetry
+          INFLUXDB_BUCKET_HW=hw_telemetry
+          INFLUXDB_ORG=ci_org
+          GRAFANA_ADMIN_USER=ci_grafana_admin
+          GRAFANA_ADMIN_PASSWORD=ci_grafana_psw
+          HOST_IP=127.0.0.1
+          EOF
+          fi
+
+      - name: Validate Compose syntax and variable resolution
+        run: docker compose -f docker/docker-compose.yml config
+
+      - name: Build Docker stack
+        run: docker compose -f docker/docker-compose.yml build
+
+  healthcheck:
+    name: Stack Health Verification
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare CI environment file
+        run: |
+          if [ -f docker/.env.example ]; then
+            cp docker/.env.example docker/.env
+            echo ".env created from .env.example"
+          else
+            echo "No .env.example found — creating minimal CI .env"
+            cat > docker/.env << 'EOF'
+          # Minimal CI environment — placeholders only
+          INFLUXDB_USERNAME=ci_influx_admin
+          INFLUXDB_PASSWORD=ci_password_placeholder
+          INFLUXDB_TOKEN=ci_token_placeholder
+          INFLUXDB_BUCKET_SIM=sim_telemetry
+          INFLUXDB_BUCKET_HW=hw_telemetry
+          INFLUXDB_ORG=ci_org
+          GRAFANA_ADMIN_USER=ci_grafana_admin
+          GRAFANA_ADMIN_PASSWORD=ci_grafana_psw
+          HOST_IP=127.0.0.1
+          EOF
+          fi
+
+      - name: Set volume permissions for CI runner
+        run: |
+          mkdir -p docker/nodered/data
+          mkdir -p docker/mosquitto/data
+          mkdir -p docker/mosquitto/log
+          sudo chown -R 1000:1000 docker/nodered/data
+          sudo chmod -R 775 docker/nodered/data
+
+      - name: Start Docker stack and wait for healthy state
+        run: |
+          docker compose -f docker/docker-compose.yml up -d --wait --wait-timeout 90
+
+      - name: Verify all services are running
+        run: |
+          echo "=== Docker Compose service status ==="
+          docker compose -f docker/docker-compose.yml ps
+
+          # Fail the job if any service is in a bad state
+          FAILED_SERVICES=$(docker compose -f docker/docker-compose.yml ps \
+            --filter "status=exited" \
+            --filter "status=restarting" \
+            --format "{{.Service}}: {{.Status}}")
+
+          if [ -z "$FAILED_SERVICES" ]; then
+            echo "All services are healthy and running."
+          else
+            echo "Critical: Unhealthy services detected!"
+            echo "---------------------------------------"
+            echo "$FAILED_SERVICES"
+            exit 1
+          fi
+
+      - name: Collect service logs (always, for debugging)
+        if: always()
+        run: docker compose -f docker/docker-compose.yml logs --no-color --tail=100
+
+      - name: Tear down Docker stack
+        if: always()
+        run: docker compose -f docker/docker-compose.yml down -v
